@@ -4,50 +4,81 @@
 #include "shader.h"
 
 #include <iostream>
+#include <string>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+const unsigned int WINDOW_WIDTH = 1000;
+const unsigned int WINDOW_HEIGHT = 800;
 
-// константы
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
-
-int main()
-{
-    // glfw: инициализация и конфигурирование
-    // ------------------------------
+void InitializeAndConfigurateGLFW() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+}
 
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Расскоментировать строчку в случае использования MacOS X
-#endif
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
 
-    // glfw создание окна
-    // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL for Ravesli.com", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
+class Window {
+public:
+    GLFWwindow* glfw_window;
+
+public:
+    Window() = default;
+
+    int Initialize(int window_width, int window_heigh, std::string window_name) {
+        glfw_window = glfwCreateWindow(window_width, window_heigh, window_name.c_str(), NULL, NULL);
+        
+        if (glfw_window == NULL) {
+            std::cout << "Error in GLFW window creation" << std::endl;
+            glfwTerminate();
+            return -1;
+        }
+
+        glfwMakeContextCurrent(glfw_window);
+        glfwSetFramebufferSizeCallback(glfw_window, FramebufferSizeCallback);
+
+        return 0;
+    }
+
+    bool IsOpen() {
+        return !glfwWindowShouldClose(glfw_window);
+    }
+
+    void ProcessInput() {
+        if (glfwGetKey(glfw_window, GLFW_KEY_C) == GLFW_PRESS) {
+            glfwSetWindowShouldClose(glfw_window, true);
+        }
+    }
+
+    void SwapBuffersAndPollEvents() {
+        glfwSwapBuffers(glfw_window);
+        glfwPollEvents();
+    }
+};
+
+int LoadPointerForOpenGLFunctions() {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cout << "Error in loading OpenGL functions" << std::endl;
         return -1;
     }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // glad: загрузка всех указателей на OpenGL-функции
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
+    return 0;
+}
 
-    // компилирование нашей шейдерной программы
-    // ------------------------------------
-    Shader ourShader("VertexShader", "FragmentShader");  // путь к файлам шейдеров
+
+int main()
+{
+    InitializeAndConfigurateGLFW();
+
+    Window window;
+    window.Initialize(WINDOW_WIDTH, WINDOW_HEIGHT, "Window name");
+
+    LoadPointerForOpenGLFunctions();
+
+    ShaderProgram shader_program;
+    shader_program.Build("VertexShader", "FragmentShader");
 
     // задание вершин (и буфера(ов)) и настройка вершинных атрибутов
     // ------------------------------------------------------------------
@@ -78,14 +109,8 @@ int main()
     // Изменение других значений VAO требует вызова glBindVertexArray в любом случае, поэтому мы обычно не снимаем привязку VAO (или VBO), когда это непосредственно не требуется.
     // glBindVertexArray(0);
 
-
-    // цикл рендеринга
-    // -----------
-    while (!glfwWindowShouldClose(window))
-    {
-        // Обработка ввода
-        // -----
-        processInput(window);
+    while (window.IsOpen()) {
+        window.ProcessInput();
 
         // Рендеринг
         // ------
@@ -93,14 +118,11 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Рендеринг треугольника
-        ourShader.use();
+        shader_program.Use();
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        window.SwapBuffersAndPollEvents();
     }
 
     // glfw: обмен содержимым переднего и заднего буферов. Опрос событий Ввода\Ввывода (была ли нажата/отпущена кнопка, перемещен курсор мыши и т.п.)
@@ -112,21 +134,4 @@ int main()
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
-}
-
-// Обработка всех событий ввода: запрос GLFW о нажатии/отпускании кнопки мыши в данном кадре и соответствующая обработка данных событий
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
-// glfw: всякий раз, когда изменяются размеры окна (пользователем или опер. системой), вызывается данная функция
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // убеждаемся, что вьюпорт соответствует новым размерам окна; обратите внимание,
-    // что ширина и высота будут значительно больше, чем указано на retina -дисплеях.
-    glViewport(0, 0, width, height);
 }
