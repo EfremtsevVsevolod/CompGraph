@@ -1,4 +1,4 @@
-#include "window.h"
+#include "../Header files/window.h"
 
 
 void InitializeAndConfigurateGLFW() {

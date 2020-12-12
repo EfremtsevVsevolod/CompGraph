@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "../Header files/shader.h"
 
 Shader::Shader() = default;
 
@@ -16,8 +16,7 @@ int Shader::LoadAndCompile(const std::string path, int type) {
         code = stream.str();
     }
     catch (std::ifstream::failure& error) {
-        std::cout << "Error in loading shader code (error code: " << error.code()
-            << ")" << std::endl;
+        std::cout << "Error in loading shader code:" << error.code() << std::endl;
         return -1;
     }
 

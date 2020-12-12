@@ -15,49 +15,29 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Code files\glad.c">
+    <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Code files\main.cpp">
+    <ClCompile Include="glad.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Code files\model.cpp">
+    <ClCompile Include="shader.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Code files\shader.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Code files\window.cpp">
+    <ClCompile Include="window.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header files\model.h">
+    <ClInclude Include="shader.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Header files\shader.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Header files\window.h">
+    <ClInclude Include="window.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Project files\CompGraph.vcxproj" />
-    <None Include="Project files\CompGraph.vcxproj.filters" />
-    <None Include="Shaders\FragmentShader">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
-    <None Include="Shaders\VertexShader">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Textures\awesomeface.png">
-      <Filter>Файлы ресурсов</Filter>
-    </Image>
-    <Image Include="Textures\wooden_container.jpg">
-      <Filter>Файлы ресурсов</Filter>
-    </Image>
+    <None Include="FragmentShader" />
+    <None Include="VertexShader" />
   </ItemGroup>
 </Project>

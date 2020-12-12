@@ -142,26 +142,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Code files\glad.c" />
-    <ClCompile Include="Code files\main.cpp" />
-    <ClCompile Include="Code files\model.cpp" />
-    <ClCompile Include="Code files\shader.cpp" />
-    <ClCompile Include="Code files\window.cpp" />
+    <ClCompile Include="glad.c" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header files\model.h" />
-    <ClInclude Include="Header files\shader.h" />
-    <ClInclude Include="Header files\window.h" />
+    <ClInclude Include="shader.h" />
+    <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Project files\CompGraph.vcxproj" />
-    <None Include="Project files\CompGraph.vcxproj.filters" />
-    <None Include="Shaders\FragmentShader" />
-    <None Include="Shaders\VertexShader" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Textures\awesomeface.png" />
-    <Image Include="Textures\wooden_container.jpg" />
+    <None Include="FragmentShader" />
+    <None Include="VertexShader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
