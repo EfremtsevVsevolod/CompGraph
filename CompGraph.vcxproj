@@ -146,11 +146,15 @@
     <ClCompile Include="Code files\main.cpp" />
     <ClCompile Include="Code files\model.cpp" />
     <ClCompile Include="Code files\shader.cpp" />
+    <ClCompile Include="Code files\stb_image.cpp" />
+    <ClCompile Include="Code files\texture.cpp" />
     <ClCompile Include="Code files\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header files\model.h" />
     <ClInclude Include="Header files\shader.h" />
+    <ClInclude Include="Header files\stb_image.h" />
+    <ClInclude Include="Header files\texture.h" />
     <ClInclude Include="Header files\window.h" />
   </ItemGroup>
   <ItemGroup>

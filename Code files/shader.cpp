@@ -1,5 +1,6 @@
 #include "../Header files/shader.h"
 
+
 Shader::Shader() = default;
 
 int Shader::LoadAndCompile(const std::string path, int type) {
@@ -58,14 +59,12 @@ void Shader::CheckCompileErrors(unsigned int identificator, int type) {
 }
 
 
+
 ShaderProgram::ShaderProgram() = default;
 
 void ShaderProgram::Build(const std::string path_to_vertex_shader,
-    const std::string path_to_fragment_shader) {
-    Shader vertex_shader;
+                          const std::string path_to_fragment_shader) {
     vertex_shader.LoadAndCompile(path_to_vertex_shader, GL_VERTEX_SHADER);
-
-    Shader fragment_shader;
     fragment_shader.LoadAndCompile(path_to_fragment_shader, GL_FRAGMENT_SHADER);
 
     identificator = glCreateProgram();

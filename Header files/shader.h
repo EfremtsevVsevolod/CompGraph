@@ -27,6 +27,8 @@ private:
 class ShaderProgram {
 public:
     unsigned int identificator;
+    Shader vertex_shader;
+    Shader fragment_shader;
 
 public:
     ShaderProgram();
