@@ -2,61 +2,11 @@
 #include <GLFW/glfw3.h>
 
 #include "shader.h"
+#include "window.h"
 
 #include <iostream>
 #include <string>
 
-const unsigned int WINDOW_WIDTH = 1000;
-const unsigned int WINDOW_HEIGHT = 800;
-
-void InitializeAndConfigurateGLFW() {
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-}
-
-void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-}
-
-class Window {
-public:
-    GLFWwindow* glfw_window;
-
-public:
-    Window() = default;
-
-    int Initialize(int window_width, int window_heigh, std::string window_name) {
-        glfw_window = glfwCreateWindow(window_width, window_heigh, window_name.c_str(), NULL, NULL);
-        
-        if (glfw_window == NULL) {
-            std::cout << "Error in GLFW window creation" << std::endl;
-            glfwTerminate();
-            return -1;
-        }
-
-        glfwMakeContextCurrent(glfw_window);
-        glfwSetFramebufferSizeCallback(glfw_window, FramebufferSizeCallback);
-
-        return 0;
-    }
-
-    bool IsOpen() {
-        return !glfwWindowShouldClose(glfw_window);
-    }
-
-    void ProcessInput() {
-        if (glfwGetKey(glfw_window, GLFW_KEY_C) == GLFW_PRESS) {
-            glfwSetWindowShouldClose(glfw_window, true);
-        }
-    }
-
-    void SwapBuffersAndPollEvents() {
-        glfwSwapBuffers(glfw_window);
-        glfwPollEvents();
-    }
-};
 
 int LoadPointerForOpenGLFunctions() {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -70,8 +20,6 @@ int LoadPointerForOpenGLFunctions() {
 
 int main()
 {
-    InitializeAndConfigurateGLFW();
-
     Window window;
     window.Initialize(WINDOW_WIDTH, WINDOW_HEIGHT, "Window name");
 
