@@ -1,15 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
-#include<iostream>
-#include <string>
-
-
-const unsigned int WINDOW_WIDTH = 1000;
-const unsigned int WINDOW_HEIGHT = 800;
 
 void InitializeAndConfigurateGLFW();
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
