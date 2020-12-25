@@ -158,8 +158,6 @@
     <ClInclude Include="Header files\texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Project files\CompGraph.vcxproj" />
-    <None Include="Project files\CompGraph.vcxproj.filters" />
     <None Include="Shaders\CubeFragmentShader" />
     <None Include="Shaders\CubeVertexShader" />
     <None Include="Shaders\LampFragmentShader" />

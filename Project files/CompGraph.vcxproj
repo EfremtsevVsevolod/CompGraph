@@ -142,18 +142,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="glad.c" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="shader.cpp" />
-    <ClCompile Include="window.cpp" />
+    <ClCompile Include="Code files\window_camera.cpp" />
+    <ClCompile Include="Code files\glad.c" />
+    <ClCompile Include="Code files\main.cpp" />
+    <ClCompile Include="Code files\model.cpp" />
+    <ClCompile Include="Code files\shader.cpp" />
+    <ClCompile Include="Code files\stb_image.cpp" />
+    <ClCompile Include="Code files\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="shader.h" />
-    <ClInclude Include="window.h" />
+    <ClInclude Include="Header files\window_camera.h" />
+    <ClInclude Include="Header files\model.h" />
+    <ClInclude Include="Header files\shader.h" />
+    <ClInclude Include="Header files\stb_image.h" />
+    <ClInclude Include="Header files\texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FragmentShader" />
-    <None Include="VertexShader" />
+    <None Include="Project files\CompGraph.vcxproj" />
+    <None Include="Project files\CompGraph.vcxproj.filters" />
+    <None Include="Shaders\CubeFragmentShader" />
+    <None Include="Shaders\CubeVertexShader" />
+    <None Include="Shaders\LampFragmentShader" />
+    <None Include="Shaders\LampVertexShader" />
+    <None Include="Shaders\PlaneFragmentShader" />
+    <None Include="Shaders\PlaneVertexShader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

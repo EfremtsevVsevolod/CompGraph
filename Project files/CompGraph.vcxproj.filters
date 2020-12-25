@@ -15,29 +15,65 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Code files\glad.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="glad.c">
+    <ClCompile Include="Code files\main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="shader.cpp">
+    <ClCompile Include="Code files\model.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="window.cpp">
+    <ClCompile Include="Code files\shader.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Code files\stb_image.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Code files\texture.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Code files\window_camera.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="shader.h">
+    <ClInclude Include="Header files\model.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="window.h">
+    <ClInclude Include="Header files\shader.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Header files\stb_image.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Header files\texture.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Header files\window_camera.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FragmentShader" />
-    <None Include="VertexShader" />
+    <None Include="Project files\CompGraph.vcxproj" />
+    <None Include="Project files\CompGraph.vcxproj.filters" />
+    <None Include="Shaders\CubeFragmentShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="Shaders\LampVertexShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="Shaders\CubeVertexShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="Shaders\LampFragmentShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="Shaders\PlaneFragmentShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="Shaders\PlaneVertexShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
   </ItemGroup>
 </Project>
