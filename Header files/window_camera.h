@@ -51,6 +51,8 @@ struct CameraState {
 };
 
 extern CameraState global_camera_state;
+extern bool blinn_phong;
+extern bool blinnKeyPressed;
 
 void InitializeAndConfigurateGLFW();
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);

@@ -160,12 +160,12 @@
   <ItemGroup>
     <None Include="Project files\CompGraph.vcxproj" />
     <None Include="Project files\CompGraph.vcxproj.filters" />
-    <None Include="Shaders\FragmentShader" />
-    <None Include="Shaders\VertexShader" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Textures\awesomeface.png" />
-    <Image Include="Textures\wooden_container.jpg" />
+    <None Include="Shaders\CubeFragmentShader" />
+    <None Include="Shaders\CubeVertexShader" />
+    <None Include="Shaders\LampFragmentShader" />
+    <None Include="Shaders\LampVertexShader" />
+    <None Include="Shaders\PlaneFragmentShader" />
+    <None Include="Shaders\PlaneVertexShader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

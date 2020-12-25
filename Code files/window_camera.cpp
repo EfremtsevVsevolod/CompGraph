@@ -34,7 +34,6 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 
 int WindowCamera::InitializeWindow(int window_width, int window_heigh, std::string window_name) {
     InitializeAndConfigurateGLFW();
-
     glfw_window = glfwCreateWindow(window_width, window_heigh, window_name.c_str(), NULL, NULL);
 
     if (glfw_window == NULL) {
@@ -76,6 +75,17 @@ void WindowCamera::ProcessInput(float delta_time) {
 
     if (glfwGetKey(glfw_window, GLFW_KEY_D) == GLFW_PRESS) {
         ProcessKeyboard(RIGHT, delta_time);
+    }
+
+    if (glfwGetKey(glfw_window, GLFW_KEY_B) == GLFW_PRESS && !blinnKeyPressed)
+    {
+        blinn_phong = !blinn_phong;
+        blinnKeyPressed = true;
+    }
+
+    if (glfwGetKey(glfw_window, GLFW_KEY_B) == GLFW_RELEASE)
+    {
+        blinnKeyPressed = false;
     }
 }
 

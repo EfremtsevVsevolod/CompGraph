@@ -57,19 +57,23 @@
   <ItemGroup>
     <None Include="Project files\CompGraph.vcxproj" />
     <None Include="Project files\CompGraph.vcxproj.filters" />
-    <None Include="Shaders\FragmentShader">
+    <None Include="Shaders\CubeFragmentShader">
       <Filter>Файлы ресурсов</Filter>
     </None>
-    <None Include="Shaders\VertexShader">
+    <None Include="Shaders\LampVertexShader">
       <Filter>Файлы ресурсов</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Textures\awesomeface.png">
+    <None Include="Shaders\CubeVertexShader">
       <Filter>Файлы ресурсов</Filter>
-    </Image>
-    <Image Include="Textures\wooden_container.jpg">
+    </None>
+    <None Include="Shaders\LampFragmentShader">
       <Filter>Файлы ресурсов</Filter>
-    </Image>
+    </None>
+    <None Include="Shaders\PlaneFragmentShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="Shaders\PlaneVertexShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
   </ItemGroup>
 </Project>
