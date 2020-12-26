@@ -158,12 +158,10 @@
     <ClInclude Include="Header files\texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\CubeFragmentShader" />
-    <None Include="Shaders\CubeVertexShader" />
     <None Include="Shaders\LampFragmentShader" />
     <None Include="Shaders\LampVertexShader" />
-    <None Include="Shaders\PlaneFragmentShader" />
-    <None Include="Shaders\PlaneVertexShader" />
+    <None Include="Shaders\MainFragmentShader" />
+    <None Include="Shaders\MainVertexShader" />
     <None Include="Shaders\ScreenFragmentShader" />
     <None Include="Shaders\ScreenVertexShader" />
     <None Include="Shaders\SimpleDepthFragmentShader" />

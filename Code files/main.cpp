@@ -34,7 +34,7 @@ double lastY;
 CameraState global_camera_state;
 
 // Освещение
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(1.5f, 1.5f, 1.0f);
 
 // Blinn (false) or Blinn-Phong (true)
 bool blinn_phong = false;
@@ -46,47 +46,48 @@ bool postEffectKeyPressed = false;
 // INITIALIZATIONS
 void InitCube(unsigned& cubeVAO, unsigned& cubeVBO) {
     float cube_verteces[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        // координаты         // нормали           // текстурные координаты
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,
 
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
 
     // настраиваем VAO (и VBO) куба
@@ -98,12 +99,16 @@ void InitCube(unsigned& cubeVAO, unsigned& cubeVBO) {
     glBindVertexArray(cubeVAO);
 
     // координатные атрибуты
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // атрибуты нормалей
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // текстурные атрибуты
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
     //glBindVertexArray(0);
@@ -166,7 +171,6 @@ void InitQuad(unsigned& quadVAO, unsigned& quadVBO) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
-
 // POST-EFFECT
 void AddPostEffect(unsigned& framebuffer, unsigned& textureColorbuffer, unsigned& RBO) {
     // 1) конфигурация фреймбуфера
@@ -213,6 +217,7 @@ void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program
 
     // мировое преобразование
     glm::mat4 cube_model = glm::mat4(1.0f);
+    cube_model = glm::translate(cube_model, glm::vec3(0.0f, 0.5f, 0.0f));
     cube_shader_program.setMat4("model", cube_model);
 }
 
@@ -247,6 +252,10 @@ void PreparePlane(WindowCamera& window_camera, ShaderProgram& plane_shader_progr
     plane_shader_program.setVec3("viewPos", global_camera_state.Position);
     plane_shader_program.setVec3("lightPos", lightPos);
     plane_shader_program.setInt("blinn_phong", blinn_phong);
+
+    // мировое преобразование
+    glm::mat4 plane_model = glm::mat4(1.0f);
+    plane_shader_program.setMat4("model", plane_model);
 }
 
 void PrepareQuad(ShaderProgram quad_shader_program) {
@@ -260,12 +269,14 @@ void PrepareQuad(ShaderProgram quad_shader_program) {
 }
 
 // RENDERINGS
-void RenderCube(unsigned& cubeVAO, unsigned& cubeVBO) {
+void RenderCube(unsigned& cubeVAO, unsigned& cubeVBO, Texture& texture) {
     if (cubeVAO == 0) {
         InitCube(cubeVAO, cubeVBO);
     }
 
+    texture.Bind(GL_TEXTURE_2D);
     glBindVertexArray(cubeVAO);
+    glActiveTexture(GL_TEXTURE0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     // glBindVertexArray(0);
 }
@@ -314,14 +325,14 @@ void RenderScene(WindowCamera& window_camera, std::map<std::string, ShaderProgra
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    PrepareCube(window_camera, shader_programs["cube"]);
-    RenderCube(VAOs["cube"], VBOs["cube"]);
+    PrepareCube(window_camera, shader_programs["main"]);
+    RenderCube(VAOs["cube"], VBOs["cube"], textures["brickwall"]);
 
-    PreparePlane(window_camera, shader_programs["plane"]);
+    PreparePlane(window_camera, shader_programs["main"]);
     RenderPlane(VAOs["plane"], VBOs["plane"], textures["plane"]);
 
     PrepareLightCube(window_camera, shader_programs["lamp"]);
-    RenderCube(VAOs["lamp"], VBOs["lamp"]);
+    RenderLightCube(VAOs["lamp"], VBOs["lamp"]);
 
     PrepareQuad(shader_programs["quad"]);
     RenderQuad(VAOs["quad"], VBOs["quad"], framebuffer, textureColorbuffer, RBO);
@@ -336,15 +347,13 @@ int main()
 
     LoadPointerForOpenGLFunctions();
 
-    ShaderProgram cube_shader_program;
+    ShaderProgram main_shader_program;
     ShaderProgram lamp_shader_program;
-    ShaderProgram plane_shader_program;
     ShaderProgram quad_shader_program;
     //ShaderProgram simple_depth_shader_program;
 
-    cube_shader_program.Build("Shaders/CubeVertexShader", "Shaders/CubeFragmentShader");
+    main_shader_program.Build("Shaders/MainVertexShader", "Shaders/MainFragmentShader");
     lamp_shader_program.Build("Shaders/LampVertexShader", "Shaders/LampFragmentShader");
-    plane_shader_program.Build("Shaders/PlaneVertexShader", "Shaders/PlaneFragmentShader");
     quad_shader_program.Build("Shaders/ScreenVertexShader", "Shaders/ScreenFragmentShader");
     //simple_depth_shader_program.Build("Shaders/SimpleDepthVertexShader", "Shaders/SimpleDepthFragmentShader");
 
@@ -352,9 +361,8 @@ int main()
     quad_shader_program.setInt("screenTexture", 0);
 
     std::map<std::string, ShaderProgram> shader_programs;
-    shader_programs.insert({ "cube", cube_shader_program });
+    shader_programs.insert({ "main", main_shader_program });
     shader_programs.insert({ "lamp", lamp_shader_program });
-    shader_programs.insert({ "plane", plane_shader_program });
     shader_programs.insert({ "quad", quad_shader_program });
     //shader_programs.insert({ "simple_depth", simple_depth_shader_program });
 
@@ -376,10 +384,14 @@ int main()
     unsigned int RBO = 0;
 
     Texture wood_texture;
+    Texture brickwall_texture;
+
     wood_texture.Inizialize("Textures/wood.png");
+    brickwall_texture.Inizialize("Textures/brickwall.jpeg");
 
     std::map<std::string, Texture> textures;
     textures.insert({ "plane", wood_texture });
+    textures.insert({ "brickwall", brickwall_texture });
 
 
     while (window_camera.IsOpen()) {
@@ -398,10 +410,8 @@ int main()
     // освобождение занятых ресурсов
     glDeleteVertexArrays(1, &cubeVAO);
     glDeleteVertexArrays(1, &planeVAO);
-    //glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &cubeVBO);
     glDeleteBuffers(1, &planeVBO);
-    //glDeleteBuffers(1, &lightVAO);
 
     glfwTerminate();
 

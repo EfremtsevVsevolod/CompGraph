@@ -55,22 +55,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\CubeFragmentShader">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
     <None Include="Shaders\LampVertexShader">
       <Filter>Файлы ресурсов</Filter>
     </None>
-    <None Include="Shaders\CubeVertexShader">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
     <None Include="Shaders\LampFragmentShader">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
-    <None Include="Shaders\PlaneFragmentShader">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
-    <None Include="Shaders\PlaneVertexShader">
       <Filter>Файлы ресурсов</Filter>
     </None>
     <None Include="Shaders\ScreenFragmentShader">
@@ -83,6 +71,12 @@
       <Filter>Файлы ресурсов</Filter>
     </None>
     <None Include="Shaders\SimpleDepthVertexShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="Shaders\MainFragmentShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="Shaders\MainVertexShader">
       <Filter>Файлы ресурсов</Filter>
     </None>
   </ItemGroup>
