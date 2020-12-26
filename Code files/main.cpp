@@ -166,6 +166,8 @@ void InitQuad(unsigned& quadVAO, unsigned& quadVBO) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
+
+// POST-EFFECT
 void AddPostEffect(unsigned& framebuffer, unsigned& textureColorbuffer, unsigned& RBO) {
     // 1) конфигурация фреймбуфера
     glGenFramebuffers(1, &framebuffer);
@@ -214,6 +216,25 @@ void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program
     cube_shader_program.setMat4("model", cube_model);
 }
 
+void PrepareLightCube(WindowCamera& window_camera, ShaderProgram& lamp_shader_program) {
+    lamp_shader_program.Use();
+    lamp_shader_program.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+    lamp_shader_program.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+    lamp_shader_program.setVec3("lightPos", lightPos);
+    lamp_shader_program.setVec3("viewPos", global_camera_state.Position);
+
+    glm::mat4 light_cube_projection = glm::perspective(glm::radians(global_camera_state.Zoom),
+        (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 light_cube_view = window_camera.GetViewMatrix();
+    lamp_shader_program.setMat4("projection", light_cube_projection);
+    lamp_shader_program.setMat4("view", light_cube_view);
+
+    glm::mat4 light_cube_model = glm::mat4(1.0f);
+    light_cube_model = glm::translate(light_cube_model, lightPos);
+    light_cube_model = glm::scale(light_cube_model, glm::vec3(0.2f)); // куб, меньшего размера
+    lamp_shader_program.setMat4("model", light_cube_model);
+}
+
 void PreparePlane(WindowCamera& window_camera, ShaderProgram& plane_shader_program) {
     plane_shader_program.Use();
     glm::mat4 plane_projection = glm::perspective(glm::radians(global_camera_state.Zoom),
@@ -245,6 +266,16 @@ void RenderCube(unsigned& cubeVAO, unsigned& cubeVBO) {
     }
 
     glBindVertexArray(cubeVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    // glBindVertexArray(0);
+}
+
+void RenderLightCube(unsigned& lightVAO, unsigned& lightVBO) {
+    if (lightVAO == 0) {
+        InitCube(lightVAO, lightVBO);
+    }
+
+    glBindVertexArray(lightVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     // glBindVertexArray(0);
 }
@@ -289,6 +320,9 @@ void RenderScene(WindowCamera& window_camera, std::map<std::string, ShaderProgra
     PreparePlane(window_camera, shader_programs["plane"]);
     RenderPlane(VAOs["plane"], VBOs["plane"], textures["plane"]);
 
+    PrepareLightCube(window_camera, shader_programs["lamp"]);
+    RenderCube(VAOs["lamp"], VBOs["lamp"]);
+
     PrepareQuad(shader_programs["quad"]);
     RenderQuad(VAOs["quad"], VBOs["quad"], framebuffer, textureColorbuffer, RBO);
 }
@@ -306,13 +340,13 @@ int main()
     ShaderProgram lamp_shader_program;
     ShaderProgram plane_shader_program;
     ShaderProgram quad_shader_program;
-    ShaderProgram simple_depth_shader_program;
+    //ShaderProgram simple_depth_shader_program;
 
     cube_shader_program.Build("Shaders/CubeVertexShader", "Shaders/CubeFragmentShader");
     lamp_shader_program.Build("Shaders/LampVertexShader", "Shaders/LampFragmentShader");
     plane_shader_program.Build("Shaders/PlaneVertexShader", "Shaders/PlaneFragmentShader");
     quad_shader_program.Build("Shaders/ScreenVertexShader", "Shaders/ScreenFragmentShader");
-    simple_depth_shader_program.Build("Shaders/SimpleDepthVertexShader", "Shaders/SimpleDepthFragmentShader");
+    //simple_depth_shader_program.Build("Shaders/SimpleDepthVertexShader", "Shaders/SimpleDepthFragmentShader");
 
     quad_shader_program.Use();
     quad_shader_program.setInt("screenTexture", 0);
@@ -322,7 +356,7 @@ int main()
     shader_programs.insert({ "lamp", lamp_shader_program });
     shader_programs.insert({ "plane", plane_shader_program });
     shader_programs.insert({ "quad", quad_shader_program });
-    shader_programs.insert({ "simple_depth", simple_depth_shader_program });
+    //shader_programs.insert({ "simple_depth", simple_depth_shader_program });
 
     glEnable(GL_DEPTH_TEST);
 
@@ -333,8 +367,8 @@ int main()
     std::map<std::string, unsigned> VAOs, VBOs;
     VAOs.insert({ "cube", 0 });
     VAOs.insert({ "plane", 0 });
+    VBOs.insert({ "lamp", 0 });
     VBOs.insert({ "quad", 0 });
-    // VBOs.insert({ "plane", 0 });
 
     // для постэффекта
     unsigned int framebuffer = 0;
@@ -347,41 +381,6 @@ int main()
     std::map<std::string, Texture> textures;
     textures.insert({ "plane", wood_texture });
 
-    //////////////////// A) Объекты
-    // 3) настраиваем VAO (и VBO) светового куба
-    unsigned int lightVAO;
-    glGenVertexArrays(1, &lightVAO);
-
-    glBindVertexArray(lightVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    //////////////////// B) Тени
-    // буфер глубины
-    unsigned int depthMapFBO;
-    glGenFramebuffers(1, &depthMapFBO);
-
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-
-    // текстура для буфера глубины
-    unsigned int depthMap;
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    // прикрепляем созданную текстуру к буферу глубины
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-    glDrawBuffer(GL_NONE); // указываем что нам не нужен цвет
-    glReadBuffer(GL_NONE); // указываем что нам не нужен цвет
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 
     while (window_camera.IsOpen()) {
         float current_frame = glfwGetTime();
@@ -393,32 +392,16 @@ int main()
         RenderScene(window_camera, shader_programs, VAOs, VBOs, textures,
                     framebuffer, textureColorbuffer, RBO);
 
-        // 2) Отрисовка светового куба
-        lamp_shader_program.Use();
-        glm::mat4 cube_projection = glm::perspective(glm::radians(global_camera_state.Zoom),
-            (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 cube_view = window_camera.GetViewMatrix();
-        lamp_shader_program.setMat4("projection", cube_projection);
-        lamp_shader_program.setMat4("view", cube_view);
-        glm::mat4 light_cube_model = glm::mat4(1.0f);
-        light_cube_model = glm::translate(light_cube_model, lightPos);
-        light_cube_model = glm::scale(light_cube_model, glm::vec3(0.2f)); // куб, меньшего размера
-        lamp_shader_program.setMat4("model", light_cube_model);
-
-        // рендеринг светового куба
-        glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
         window_camera.SwapBuffersAndPollEvents();
     }
 
     // освобождение занятых ресурсов
     glDeleteVertexArrays(1, &cubeVAO);
     glDeleteVertexArrays(1, &planeVAO);
-    glDeleteVertexArrays(1, &lightVAO);
+    //glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &cubeVBO);
     glDeleteBuffers(1, &planeVBO);
-    glDeleteBuffers(1, &lightVAO);
+    //glDeleteBuffers(1, &lightVAO);
 
     glfwTerminate();
 
