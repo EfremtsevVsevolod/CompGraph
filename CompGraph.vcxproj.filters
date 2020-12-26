@@ -73,5 +73,11 @@
     <None Include="Shaders\PlaneVertexShader">
       <Filter>Файлы ресурсов</Filter>
     </None>
+    <None Include="Shaders\ScreenFragmentShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="Shaders\ScreenVertexShader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
   </ItemGroup>
 </Project>

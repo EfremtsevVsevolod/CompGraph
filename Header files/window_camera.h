@@ -54,6 +54,9 @@ extern CameraState global_camera_state;
 extern bool blinn_phong;
 extern bool blinnKeyPressed;
 
+extern bool post_effect;
+extern bool postEffectKeyPressed;
+
 void InitializeAndConfigurateGLFW();
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 

@@ -1,0 +1,41 @@
+#version 330 core
+out vec4 FragColor;
+
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform bool post_effect;
+ 
+void main()
+{
+    if (post_effect) {
+        float offset = 0.01; 
+        
+        vec2 offsets[9] = vec2[](
+            vec2(-offset, offset), vec2( 0.0f, offset),  vec2( offset, offset),
+            vec2(-offset, 0.0f), vec2( 0.0f, 0.0f), vec2( offset, 0.0f), 
+            vec2(-offset, -offset), vec2( 0.0f, -offset), vec2( offset, -offset)
+        );
+ 
+        float kernel[9] = float[](
+            1, 2, 1,
+            2, 4, 2,
+            1, 2, 1
+        );
+
+        float divisior = 16;
+    
+        vec3 partOfTexture[9];
+        for(int i = 0; i < 9; i++)
+        {
+            partOfTexture[i] = vec3(texture(screenTexture, TexCoords.st + offsets[i]));
+        }
+        vec3 col = vec3(0.0);
+        for(int i = 0; i < 9; i++)
+            col += partOfTexture[i] * kernel[i] / divisior;
+    
+        FragColor = vec4(col, 1.0);
+    } else {
+        FragColor = texture(screenTexture, TexCoords);
+    }
+} 

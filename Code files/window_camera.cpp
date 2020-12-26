@@ -87,6 +87,17 @@ void WindowCamera::ProcessInput(float delta_time) {
     {
         blinnKeyPressed = false;
     }
+
+    if (glfwGetKey(glfw_window, GLFW_KEY_P) == GLFW_PRESS && !postEffectKeyPressed)
+    {
+        post_effect = !post_effect;
+        postEffectKeyPressed = true;
+    }
+
+    if (glfwGetKey(glfw_window, GLFW_KEY_P) == GLFW_RELEASE)
+    {
+        postEffectKeyPressed = false;
+    }
 }
 
 void WindowCamera::SwapBuffersAndPollEvents() {
