@@ -166,6 +166,8 @@
     <None Include="Shaders\PlaneVertexShader" />
     <None Include="Shaders\ScreenFragmentShader" />
     <None Include="Shaders\ScreenVertexShader" />
+    <None Include="Shaders\SimpleDepthFragmentShader" />
+    <None Include="Shaders\SimpleDepthVertexShader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
