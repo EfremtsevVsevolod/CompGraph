@@ -71,8 +71,8 @@ bool normalMappingKeyPressed = true;
 bool activate_rotation = false;
 bool activaleRotationKeyPressed = false;
 
-bool parallax = false;
-bool parallaxKeyPressed = false;
+bool parallax = true;
+bool parallaxKeyPressed = true;
 
 
 //  AUXILARY FUNCTIONS
@@ -128,44 +128,43 @@ void InitializeTangentAndBitangentComponents(float vertices[], int vertices_size
 
 // INITIALIZATIONS
 void InitCube(unsigned& cubeVAO, unsigned& cubeVBO) {
-    int cube_verteces_size = 36 * 14;
     float cube_verteces[] = {
         // координаты         // нормали           // текст. к. // кас.   // бикасательные
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
          0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
         -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
 
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
-         0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
-
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+        
         -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
         -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
         -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
         -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
         -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
         -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
-
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+        
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
          0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
          0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
-
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         
         -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
          0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
          0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
          0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
         -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
         -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
-
+        
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
          0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
          0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
@@ -173,6 +172,7 @@ void InitCube(unsigned& cubeVAO, unsigned& cubeVBO) {
         -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0
     };
+    int cube_verteces_size = sizeof(cube_verteces) / sizeof(float);
 
     InitializeTangentAndBitangentComponents(cube_verteces, cube_verteces_size);
 
@@ -209,7 +209,6 @@ void InitCube(unsigned& cubeVAO, unsigned& cubeVBO) {
 }
 
 void InitPlane(unsigned& planeVAO, unsigned& planeVBO) {
-    int plane_vertices_size = 6 * 14;
     float plane_vertices[] = {
         // координаты            // нормали         // текст.к.   // T      // B
          10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,  0, 0, 0,  0, 0, 0,
@@ -220,6 +219,8 @@ void InitPlane(unsigned& planeVAO, unsigned& planeVBO) {
         -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,  0, 0, 0,  0, 0, 0,
          10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f,  0, 0, 0,  0, 0, 0
     };
+
+    int plane_vertices_size = sizeof(plane_vertices) / sizeof(float);
 
     InitializeTangentAndBitangentComponents(plane_vertices, plane_vertices_size);
 
@@ -333,10 +334,10 @@ void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program
     cube_model = glm::scale(cube_model, glm::vec3(cube_size, cube_size, cube_size));
 
     if (enable_rotation && activate_rotation) {
-        rotation_angle += glm::radians(delta_time * (-10.0f));
+        rotation_angle += glm::radians(delta_time * 30.0f);
     }
     if (enable_rotation) {
-        cube_model = glm::rotate(cube_model, rotation_angle, glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
+        cube_model = glm::rotate(cube_model, rotation_angle, glm::normalize(glm::vec3(1.0, 1.0, 0.0)));
     }
 
     cube_shader_program.setMat4("model", cube_model);

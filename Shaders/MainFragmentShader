@@ -23,20 +23,45 @@ uniform bool normal_mapping_flag;
 uniform bool paralax_flag;
 uniform float height_scale;
 
-vec2 ParallaxMapping(vec2 tex_coords, vec3 view_dir) {
-    float height = texture(depthMap, tex_coords).r;
-    
-    if (height_scale == 0) {
-        return vec2(0, 0);
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{ 
+    // количество слоев глубины
+    const float minLayers = 4;
+    const float maxLayers = 16;
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
+    // вычисляем размер каждого слоя
+    float layerDepth = 1.0 / numLayers;
+    // глубина текущего слоя
+    float currentLayerDepth = 0.0;
+    // величина сдвига текстурных координат для каждого слоя (из вектора P)
+    vec2 P = viewDir.xy / viewDir.z * height_scale; 
+    vec2 deltaTexCoords = P / numLayers;
+  
+    // получаем начальные значения
+    vec2  currentTexCoords     = texCoords;
+    float currentDepthMapValue = texture(depthMap, currentTexCoords).r;
+      
+    while(currentLayerDepth < currentDepthMapValue)
+    {
+        // сдвигаем текстурные координаты вдоль направления вектора P
+        currentTexCoords -= deltaTexCoords;
+        // получаем значение глубины из карты глубины для текущих текстурных координат
+        currentDepthMapValue = texture(depthMap, currentTexCoords).r;  
+        // получаем значение глубины следующего слоя
+        currentLayerDepth += layerDepth;  
     }
-
-    vec2 paralax_shift = view_dir.xy / view_dir.z * (height * height_scale);
-    return tex_coords - paralax_shift; 
+    
+    return currentTexCoords;
 }
 
 vec2 calc_tex_coords(vec3 view_dir) {
     if (paralax_flag) {
-        return ParallaxMapping(fs_in.TexCoords,  view_dir);
+        vec2 tex_coords = ParallaxMapping(fs_in.TexCoords,  view_dir);
+        if(tex_coords.x > 1.0 || tex_coords.y > 1.0 || tex_coords.x < 0.0 || tex_coords.y < 0.0) {
+            discard;
+        }
+
+        return tex_coords;
     } else {
         return fs_in.TexCoords;
     }
