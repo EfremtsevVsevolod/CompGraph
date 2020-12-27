@@ -61,7 +61,6 @@ void WindowCamera::ProcessInput(float delta_time) {
     if (glfwGetKey(glfw_window, GLFW_KEY_C) == GLFW_PRESS) {
         glfwSetWindowShouldClose(glfw_window, true);
     }
-
     if (glfwGetKey(glfw_window, GLFW_KEY_W) == GLFW_PRESS) {
         ProcessKeyboard(FORWARD, delta_time);
     }
@@ -76,7 +75,6 @@ void WindowCamera::ProcessInput(float delta_time) {
     if (glfwGetKey(glfw_window, GLFW_KEY_D) == GLFW_PRESS) {
         ProcessKeyboard(RIGHT, delta_time);
     }
-
     if (glfwGetKey(glfw_window, GLFW_KEY_B) == GLFW_PRESS && !blinnKeyPressed)
     {
         blinn_phong = !blinn_phong;
@@ -88,13 +86,12 @@ void WindowCamera::ProcessInput(float delta_time) {
         blinnKeyPressed = false;
     }
 
-    if (glfwGetKey(glfw_window, GLFW_KEY_P) == GLFW_PRESS && !postEffectKeyPressed)
+    if (glfwGetKey(glfw_window, GLFW_KEY_E) == GLFW_PRESS && !postEffectKeyPressed)
     {
         post_effect = !post_effect;
         postEffectKeyPressed = true;
     }
-
-    if (glfwGetKey(glfw_window, GLFW_KEY_P) == GLFW_RELEASE)
+    if (glfwGetKey(glfw_window, GLFW_KEY_E) == GLFW_RELEASE)
     {
         postEffectKeyPressed = false;
     }
@@ -104,10 +101,44 @@ void WindowCamera::ProcessInput(float delta_time) {
         normal_mapping_effect = !normal_mapping_effect;
         normalMappingKeyPressed = true;
     }
-
     if (glfwGetKey(glfw_window, GLFW_KEY_N) == GLFW_RELEASE)
     {
         normalMappingKeyPressed = false;
+    }
+
+    if (glfwGetKey(glfw_window, GLFW_KEY_R) == GLFW_PRESS && !activaleRotationKeyPressed)
+    {
+        activate_rotation = !activate_rotation;
+        activaleRotationKeyPressed = true;
+    }
+    if (glfwGetKey(glfw_window, GLFW_KEY_R) == GLFW_RELEASE)
+    {
+        activaleRotationKeyPressed = false;
+    }
+
+    if (glfwGetKey(glfw_window, GLFW_KEY_P) == GLFW_PRESS && !parallaxKeyPressed)
+    {
+        parallax = !parallax;
+        parallaxKeyPressed = true;
+    }
+    if (glfwGetKey(glfw_window, GLFW_KEY_P) == GLFW_RELEASE)
+    {
+        parallaxKeyPressed = false;
+    }
+
+    if (glfwGetKey(glfw_window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS && parallaxKeyPressed)
+    {
+        if (height_scale > 0.0f) {
+            height_scale -= 0.0005f;
+        } else {
+            height_scale = 0.0f;
+        }
+    } else if (glfwGetKey(glfw_window, GLFW_KEY_KP_ADD) == GLFW_PRESS && parallaxKeyPressed) {
+        if (height_scale < 1.0f) {
+            height_scale += 0.0005f;
+        } else {
+            height_scale = 1.0f;
+        }
     }
 }
 

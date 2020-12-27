@@ -51,6 +51,8 @@ struct CameraState {
 };
 
 extern CameraState global_camera_state;
+extern float height_scale;
+
 extern bool blinn_phong;
 extern bool blinnKeyPressed;
 
@@ -59,6 +61,12 @@ extern bool postEffectKeyPressed;
 
 extern bool normal_mapping_effect;
 extern bool normalMappingKeyPressed;
+
+extern bool activate_rotation;
+extern bool activaleRotationKeyPressed;
+
+extern bool parallax;
+extern bool parallaxKeyPressed;
 
 void InitializeAndConfigurateGLFW();
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);

@@ -32,6 +32,9 @@ bool first_mouse = true;
 double lastX;
 double lastY;
 
+float rotation_angle;
+float height_scale = 0.1;
+
 CameraState global_camera_state;
 
 // ќсвещение
@@ -46,6 +49,12 @@ bool postEffectKeyPressed = false;
 
 bool normal_mapping_effect = true;
 bool normalMappingKeyPressed = true;
+
+bool activate_rotation = false;
+bool activaleRotationKeyPressed = false;
+
+bool parallax = false;
+bool parallaxKeyPressed = false;
 
 
 //  AUXILARY FUNCTIONS
@@ -280,17 +289,19 @@ void AddPostEffect(unsigned& framebuffer, unsigned& textureColorbuffer, unsigned
 
 // PREPARATIONS
 void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program,
-                 glm::vec3 cube_position, float cube_size = 1.0f) {
+                 glm::vec3 cube_position, float cube_size, bool enable_rotation) {
     cube_shader_program.Use();
-    //cube_shader_program.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-    //cube_shader_program.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
     cube_shader_program.setVec3("lightPos", lightPos - cube_position);
     cube_shader_program.setVec3("viewPos", global_camera_state.Position - cube_position);
 
-
     cube_shader_program.setInt("diffuseMap", 0);
     cube_shader_program.setInt("normalMap", 1);
+    cube_shader_program.setInt("depthMap", 2);
+
+    cube_shader_program.setFloat("height_scale", height_scale);
+
     cube_shader_program.setBool("normal_mapping_flag", normal_mapping_effect);
+    cube_shader_program.setBool("paralax_flag", parallax);
 
     glm::mat4 cube_projection = glm::perspective(glm::radians(global_camera_state.Zoom),
         (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
@@ -302,6 +313,14 @@ void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program
     glm::mat4 cube_model = glm::mat4(1.0f);
     cube_model = glm::translate(cube_model, cube_position);
     cube_model = glm::scale(cube_model, glm::vec3(cube_size, cube_size, cube_size));
+
+    if (enable_rotation && activate_rotation) {
+        rotation_angle += glm::radians(delta_time * (-10.0f));
+    }
+    if (enable_rotation) {
+        cube_model = glm::rotate(cube_model, rotation_angle, glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
+    }
+
     cube_shader_program.setMat4("model", cube_model);
 }
 
@@ -334,7 +353,11 @@ void PreparePlane(WindowCamera& window_camera, ShaderProgram& plane_shader_progr
 
     plane_shader_program.setInt("diffuseMap", 0);
     plane_shader_program.setInt("normalMap", 1);
+
+    plane_shader_program.setFloat("height_scale", 0);
+
     plane_shader_program.setBool("normal_mapping_flag", normal_mapping_effect);
+    plane_shader_program.setBool("paralax_flag", false);
 
     // установка uniforms-переменных освещени€
     plane_shader_program.setVec3("viewPos", global_camera_state.Position);
@@ -368,6 +391,8 @@ void RenderCube(unsigned& cubeVAO, unsigned& cubeVBO, std::map<std::string, Text
     textures["brickwall"].Bind(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE1);
     textures["brickwall_normals"].Bind(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE2);
+    textures["brickwall_heights"].Bind(GL_TEXTURE_2D);
 
     glDrawArrays(GL_TRIANGLES, 0, 36);
     // glBindVertexArray(0);
@@ -422,10 +447,10 @@ void RenderScene(WindowCamera& window_camera, std::map<std::string, ShaderProgra
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    PrepareCube(window_camera, shader_programs["main"], glm::vec3(0.0f, 0.5f, 0.0f));
+    PrepareCube(window_camera, shader_programs["main"], glm::vec3(0.0f, 0.5f, 0.0f), 1.0f, true);
     RenderCube(VAOs["cube"], VBOs["cube"], textures);
 
-    PrepareCube(window_camera, shader_programs["main"], glm::vec3(2.0f, 0.5f, 2.0f), 0.5f);
+    PrepareCube(window_camera, shader_programs["main"], glm::vec3(2.0f, 0.5f, 2.0f), 0.5f, false);
     RenderCube(VAOs["cube"], VBOs["cube"], textures);
 
     PreparePlane(window_camera, shader_programs["main"]);
@@ -487,17 +512,20 @@ int main()
     Texture wood_normals;
     Texture brickwall_texture;
     Texture brickwall_normals;
+    Texture brickwall_heights;
 
     wood_texture.Inizialize("Textures/wood.png");
     wood_normals.Inizialize("Textures/NormalMapFloor.jpeg");
-    brickwall_texture.Inizialize("Textures/brickwall.jpeg");
-    brickwall_normals.Inizialize("Textures/brickwall_normal.jpeg");
+    brickwall_texture.Inizialize("Textures/bricks2.jpg");
+    brickwall_normals.Inizialize("Textures/bricks2_normal.jpg");
+    brickwall_heights.Inizialize("Textures/bricks2_disp.jpg");
 
     std::map<std::string, Texture> textures;
     textures.insert({ "plane", wood_texture });
     textures.insert({ "plane_normals", wood_normals });
     textures.insert({ "brickwall", brickwall_texture });
     textures.insert({ "brickwall_normals", brickwall_normals });
+    textures.insert({ "brickwall_heights", brickwall_heights });
 
     while (window_camera.IsOpen()) {
         float current_frame = glfwGetTime();

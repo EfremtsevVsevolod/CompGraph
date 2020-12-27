@@ -13,17 +13,40 @@ in VS_OUT{
 
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
+uniform sampler2D depthMap;
+
 uniform vec3 lightPos;
 uniform vec3 viewPos;
+
 uniform bool blinn_phong;
 uniform bool normal_mapping_flag;
+uniform bool paralax_flag;
+uniform float height_scale;
 
-vec3 calc_normal() {
+vec2 ParallaxMapping(vec2 tex_coords, vec3 view_dir) {
+    float height = texture(depthMap, tex_coords).r;
+    
+    if (height_scale == 0) {
+        return vec2(0, 0);
+    }
+
+    vec2 paralax_shift = view_dir.xy / view_dir.z * (height * height_scale);
+    return tex_coords - paralax_shift; 
+}
+
+vec2 calc_tex_coords(vec3 view_dir) {
+    if (paralax_flag) {
+        return ParallaxMapping(fs_in.TexCoords,  view_dir);
+    } else {
+        return fs_in.TexCoords;
+    }
+}
+
+vec3 calc_normal(vec2 tex_coords) {
     vec3 normal;
+
     if (normal_mapping_flag) {
-        normal = texture(normalMap, fs_in.TexCoords).rgb;
- 
-        // ѕереводим вектор нормали в диапазон [-1,1]
+        normal = texture(normalMap, tex_coords).rgb;
         normal = normalize(normal * 2.0 - 1.0);
     } else {
         normal = normalize(fs_in.Normal);
@@ -73,10 +96,12 @@ float calc_spec(vec3 light_dir, vec3 view_dir, vec3 normal) {
 
 void main()
 {
-    vec3 normal = calc_normal();
+    vec3 view_dir = calc_view_dir();
+    vec2 tex_coords = calc_tex_coords(view_dir);
+    vec3 normal = calc_normal(tex_coords);
     
     // получаем диффузный цвет
-    vec3 color = texture(diffuseMap, fs_in.TexCoords).rgb;
+    vec3 color = texture(diffuseMap, tex_coords).rgb;
 
     // фонова€ составл€юща€
     vec3 ambient = 0.1 * color;
@@ -87,7 +112,6 @@ void main()
     vec3 diffuse = diff * color;
 
     // отраженна€ составл€юща€
-    vec3 view_dir = calc_view_dir();
     vec3 reflect_dir = reflect(-light_dir, normal);
     float spec = calc_spec(light_dir, view_dir, normal);
     vec3 specular = vec3(0.2) * spec; // подразумеваем €ркий белый 
