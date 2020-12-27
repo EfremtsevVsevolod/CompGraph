@@ -98,6 +98,17 @@ void WindowCamera::ProcessInput(float delta_time) {
     {
         postEffectKeyPressed = false;
     }
+
+    if (glfwGetKey(glfw_window, GLFW_KEY_N) == GLFW_PRESS && !normalMappingKeyPressed)
+    {
+        normal_mapping_effect = !normal_mapping_effect;
+        normalMappingKeyPressed = true;
+    }
+
+    if (glfwGetKey(glfw_window, GLFW_KEY_N) == GLFW_RELEASE)
+    {
+        normalMappingKeyPressed = false;
+    }
 }
 
 void WindowCamera::SwapBuffersAndPollEvents() {

@@ -57,6 +57,9 @@ extern bool blinnKeyPressed;
 extern bool post_effect;
 extern bool postEffectKeyPressed;
 
+extern bool normal_mapping_effect;
+extern bool normalMappingKeyPressed;
+
 void InitializeAndConfigurateGLFW();
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 

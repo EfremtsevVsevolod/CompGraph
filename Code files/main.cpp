@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <utility>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -43,52 +44,110 @@ bool blinnKeyPressed = false;
 bool post_effect = false;
 bool postEffectKeyPressed = false;
 
+bool normal_mapping_effect = true;
+bool normalMappingKeyPressed = true;
+
+
+//  AUXILARY FUNCTIONS
+std::pair<glm::vec3, glm::vec3>
+CalculateTangentAndBitangentVectors(glm::vec3 pos1, glm::vec3 pos2, glm::vec3 pos3,
+    glm::vec2 uv1, glm::vec2 uv2, glm::vec2 uv3, glm::vec3 nm) {
+    glm::vec3 tangent, bitangent;
+
+    glm::vec3 edge1 = pos2 - pos1;
+    glm::vec3 edge2 = pos3 - pos1;
+    glm::vec2 deltaUV1 = uv2 - uv1;
+    glm::vec2 deltaUV2 = uv3 - uv1;
+
+    float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+    tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+    bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+    bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+    bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+
+    return std::make_pair(tangent, bitangent);
+}
+
+void InitializeTangentAndBitangentComponents(float vertices[], int vertices_size) {
+    for (int i = 0; i < vertices_size; i += 14 * 3) {
+        glm::vec3 pos1(vertices[i], vertices[i + 1], vertices[i + 2]);
+        glm::vec3 pos2(vertices[14 + i], vertices[14 + i + 1], vertices[14 + i + 2]);
+        glm::vec3 pos3(vertices[2 * 14 + i], vertices[2 * 14 + i + 1], vertices[2 * 14 + i + 2]);
+
+        glm::vec3 nm(vertices[i + 3], vertices[i + 4], vertices[i + 5]);
+
+        glm::vec2 uv1(vertices[i + 6], vertices[i + 7]);
+        glm::vec2 uv2(vertices[14 + i + 6], vertices[14 + i + 7]);
+        glm::vec2 uv3(vertices[2 * 14 + i + 6], vertices[2 * 14 + i + 7]);
+
+        auto result = CalculateTangentAndBitangentVectors(pos1, pos2, pos3, uv1, uv2, uv3, nm);
+        glm::vec3 tangent = result.first;
+        glm::vec3 bitangent = result.second;
+
+        for (int j = 0; j < 3; ++j) {
+            vertices[j * 14 + i + 8] = tangent.x;
+            vertices[j * 14 + i + 9] = tangent.y;
+            vertices[j * 14 + i + 10] = tangent.z;
+            vertices[j * 14 + i + 11] = bitangent.x;
+            vertices[j * 14 + i + 12] = bitangent.y;
+            vertices[j * 14 + i + 13] = bitangent.z;
+        }
+    }
+}
+
 // INITIALIZATIONS
 void InitCube(unsigned& cubeVAO, unsigned& cubeVBO) {
+    int cube_verteces_size = 36 * 14;
     float cube_verteces[] = {
-        // координаты         // нормали           // текстурные координаты
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+        // координаты         // нормали           // текст. к. // кас.   // бикасательные
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
 
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
 
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
 
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
 
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0
     };
+
+    InitializeTangentAndBitangentComponents(cube_verteces, cube_verteces_size);
 
     // настраиваем VAO (и VBO) куба
     glGenVertexArrays(1, &cubeVAO);
@@ -99,34 +158,45 @@ void InitCube(unsigned& cubeVAO, unsigned& cubeVBO) {
     glBindVertexArray(cubeVAO);
 
     // координатные атрибуты
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)0);
+    
     // атрибуты нормалей
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(3 * sizeof(float)));
+    
     // текстурные атрибуты
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(6 * sizeof(float)));
+
+    // касательные векторы
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(8 * sizeof(float)));
+
+    // бикасательные векторы
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(11 * sizeof(float)));
 
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //glBindVertexArray(0);
+    glBindVertexArray(0);
 }
 
 void InitPlane(unsigned& planeVAO, unsigned& planeVBO) {
+    int plane_vertices_size = 6 * 14;
     float plane_vertices[] = {
-        // координаты            // нормали         // текстурные координаты
-         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
-        -10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
+        // координаты            // нормали         // текст.к.   // T      // B
+         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,  0, 0, 0,  0, 0, 0,
+        -10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,  0, 0, 0,  0, 0, 0,
+        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,  0, 0, 0,  0, 0, 0,
 
-         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
-        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
-         10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f
+         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,  0, 0, 0,  0, 0, 0,
+        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,  0, 0, 0,  0, 0, 0,
+         10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f,  0, 0, 0,  0, 0, 0
     };
 
-    // 1) настраиваем VAO (и VBO) плоскости
+    InitializeTangentAndBitangentComponents(plane_vertices, plane_vertices_size);
+
+    // настраиваем VAO (и VBO) плоскости
     glGenVertexArrays(1, &planeVAO);
     glGenBuffers(1, &planeVBO);
 
@@ -135,13 +205,20 @@ void InitPlane(unsigned& planeVAO, unsigned& planeVBO) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(plane_vertices), plane_vertices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(4);
+
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(11 * sizeof(float)));
+
     glBindVertexArray(0);
 }
 
@@ -202,12 +279,18 @@ void AddPostEffect(unsigned& framebuffer, unsigned& textureColorbuffer, unsigned
 }
 
 // PREPARATIONS
-void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program) {
+void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program,
+                 glm::vec3 cube_position, float cube_size = 1.0f) {
     cube_shader_program.Use();
-    cube_shader_program.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-    cube_shader_program.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-    cube_shader_program.setVec3("lightPos", lightPos);
+    //cube_shader_program.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+    //cube_shader_program.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+    cube_shader_program.setVec3("lightPos", lightPos - cube_position);
     cube_shader_program.setVec3("viewPos", global_camera_state.Position);
+
+
+    cube_shader_program.setInt("diffuseMap", 0);
+    cube_shader_program.setInt("normalMap", 1);
+    cube_shader_program.setBool("normal_mapping_flag", normal_mapping_effect);
 
     glm::mat4 cube_projection = glm::perspective(glm::radians(global_camera_state.Zoom),
         (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
@@ -217,7 +300,8 @@ void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program
 
     // мировое преобразование
     glm::mat4 cube_model = glm::mat4(1.0f);
-    cube_model = glm::translate(cube_model, glm::vec3(0.0f, 0.5f, 0.0f));
+    cube_model = glm::translate(cube_model, cube_position);
+    cube_model = glm::scale(cube_model, glm::vec3(cube_size, cube_size, cube_size));
     cube_shader_program.setMat4("model", cube_model);
 }
 
@@ -236,7 +320,7 @@ void PrepareLightCube(WindowCamera& window_camera, ShaderProgram& lamp_shader_pr
 
     glm::mat4 light_cube_model = glm::mat4(1.0f);
     light_cube_model = glm::translate(light_cube_model, lightPos);
-    light_cube_model = glm::scale(light_cube_model, glm::vec3(0.2f)); // куб, меньшего размера
+    light_cube_model = glm::scale(light_cube_model, glm::vec3(0.2f));
     lamp_shader_program.setMat4("model", light_cube_model);
 }
 
@@ -247,6 +331,10 @@ void PreparePlane(WindowCamera& window_camera, ShaderProgram& plane_shader_progr
     glm::mat4 plane_view = window_camera.GetViewMatrix();
     plane_shader_program.setMat4("projection", plane_projection);
     plane_shader_program.setMat4("view", plane_view);
+
+    plane_shader_program.setInt("diffuseMap", 0);
+    plane_shader_program.setInt("normalMap", 1);
+    plane_shader_program.setBool("normal_mapping_flag", normal_mapping_effect);
 
     // установка uniforms-переменных освещения
     plane_shader_program.setVec3("viewPos", global_camera_state.Position);
@@ -265,18 +353,22 @@ void PrepareQuad(ShaderProgram quad_shader_program) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     quad_shader_program.Use();
-    quad_shader_program.setInt("post_effect", post_effect);
+    quad_shader_program.setBool("post_effect", post_effect);
 }
 
 // RENDERINGS
-void RenderCube(unsigned& cubeVAO, unsigned& cubeVBO, Texture& texture) {
+void RenderCube(unsigned& cubeVAO, unsigned& cubeVBO, std::map<std::string, Texture>& textures) {
     if (cubeVAO == 0) {
         InitCube(cubeVAO, cubeVBO);
     }
 
-    texture.Bind(GL_TEXTURE_2D);
     glBindVertexArray(cubeVAO);
+
     glActiveTexture(GL_TEXTURE0);
+    textures["brickwall"].Bind(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE1);
+    textures["brickwall_normals"].Bind(GL_TEXTURE_2D);
+
     glDrawArrays(GL_TRIANGLES, 0, 36);
     // glBindVertexArray(0);
 }
@@ -291,14 +383,18 @@ void RenderLightCube(unsigned& lightVAO, unsigned& lightVBO) {
     // glBindVertexArray(0);
 }
 
-void RenderPlane(unsigned& planeVAO, unsigned& planeVBO, Texture& texture) {
+void RenderPlane(unsigned& planeVAO, unsigned& planeVBO, std::map<std::string, Texture>& textures) {
     if (planeVAO == 0) {
         InitPlane(planeVAO, planeVBO);
     }
 
-    texture.Bind(GL_TEXTURE_2D);
     glBindVertexArray(planeVAO);
+
     glActiveTexture(GL_TEXTURE0);
+    textures["plane"].Bind(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE1);
+    textures["plane_normals"].Bind(GL_TEXTURE_2D);
+    
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
@@ -310,6 +406,7 @@ void RenderQuad(unsigned& quadVAO, unsigned& quadVBO,
     }
 
     glBindVertexArray(quadVAO);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -325,11 +422,14 @@ void RenderScene(WindowCamera& window_camera, std::map<std::string, ShaderProgra
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    PrepareCube(window_camera, shader_programs["main"]);
-    RenderCube(VAOs["cube"], VBOs["cube"], textures["brickwall"]);
+    PrepareCube(window_camera, shader_programs["main"], glm::vec3(0.0f, 0.5f, 0.0f));
+    RenderCube(VAOs["cube"], VBOs["cube"], textures);
+
+    PrepareCube(window_camera, shader_programs["main"], glm::vec3(2.0f, 0.5f, 2.0f), 0.5f);
+    RenderCube(VAOs["cube"], VBOs["cube"], textures);
 
     PreparePlane(window_camera, shader_programs["main"]);
-    RenderPlane(VAOs["plane"], VBOs["plane"], textures["plane"]);
+    RenderPlane(VAOs["plane"], VBOs["plane"], textures);
 
     PrepareLightCube(window_camera, shader_programs["lamp"]);
     RenderLightCube(VAOs["lamp"], VBOs["lamp"]);
@@ -384,15 +484,20 @@ int main()
     unsigned int RBO = 0;
 
     Texture wood_texture;
+    Texture wood_normals;
     Texture brickwall_texture;
+    Texture brickwall_normals;
 
     wood_texture.Inizialize("Textures/wood.png");
+    wood_normals.Inizialize("Textures/NormalMapFloor.jpeg");
     brickwall_texture.Inizialize("Textures/brickwall.jpeg");
+    brickwall_normals.Inizialize("Textures/brickwall_normal.jpeg");
 
     std::map<std::string, Texture> textures;
     textures.insert({ "plane", wood_texture });
+    textures.insert({ "plane_normals", wood_normals });
     textures.insert({ "brickwall", brickwall_texture });
-
+    textures.insert({ "brickwall_normals", brickwall_normals });
 
     while (window_camera.IsOpen()) {
         float current_frame = glfwGetTime();
