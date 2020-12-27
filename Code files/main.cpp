@@ -24,9 +24,27 @@ void LoadPointerForOpenGLFunctions() {
         std::cout << "Error in loading OpenGL functions" << std::endl;
     }
 }
+void FreeResourcesAndTerminate(std::map<std::string, unsigned>& VAOs,
+                               std::map<std::string, unsigned>& VBOs) {
+    for (auto& VAO : VAOs) {
+        glDeleteVertexArrays(1, &VAO.second);
+    }
+
+    for (auto& VBO : VBOs) {
+        glDeleteVertexArrays(1, &VBO.second);
+    }
+
+    glfwTerminate();
+}
 
 float delta_time = 0.0f;
 float last_frame = 0.0f;
+
+void ProcessTime() {
+    float current_frame = glfwGetTime();
+    delta_time = current_frame - last_frame;
+    last_frame = current_frame;
+}
 
 bool first_mouse = true;
 double lastX;
@@ -493,10 +511,6 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
-    unsigned cubeVBO = 0, cubeVAO = 0;
-    unsigned planeVBO = 0, planeVAO = 0;
-    unsigned int quadVAO = 0, quadVBO = 0;
-
     std::map<std::string, unsigned> VAOs, VBOs;
     VAOs.insert({ "cube", 0 });
     VAOs.insert({ "plane", 0 });
@@ -528,9 +542,7 @@ int main()
     textures.insert({ "brickwall_heights", brickwall_heights });
 
     while (window_camera.IsOpen()) {
-        float current_frame = glfwGetTime();
-        delta_time = current_frame - last_frame;
-        last_frame = current_frame;
+        ProcessTime();
 
         window_camera.ProcessInput(delta_time);
 
@@ -540,13 +552,7 @@ int main()
         window_camera.SwapBuffersAndPollEvents();
     }
 
-    // освобождение занятых ресурсов
-    glDeleteVertexArrays(1, &cubeVAO);
-    glDeleteVertexArrays(1, &planeVAO);
-    glDeleteBuffers(1, &cubeVBO);
-    glDeleteBuffers(1, &planeVBO);
-
-    glfwTerminate();
+    FreeResourcesAndTerminate(VAOs, VBOs);
 
     return 0;
 }
