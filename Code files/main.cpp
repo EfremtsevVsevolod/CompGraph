@@ -285,7 +285,7 @@ void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program
     //cube_shader_program.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
     //cube_shader_program.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
     cube_shader_program.setVec3("lightPos", lightPos - cube_position);
-    cube_shader_program.setVec3("viewPos", global_camera_state.Position);
+    cube_shader_program.setVec3("viewPos", global_camera_state.Position - cube_position);
 
 
     cube_shader_program.setInt("diffuseMap", 0);
