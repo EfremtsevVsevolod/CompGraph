@@ -158,12 +158,12 @@ void InitCube(unsigned& cubeVAO, unsigned& cubeVBO) {
          0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
          0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
          
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
          0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
-         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
         -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,  0, 0, 0,  0, 0, 0,
-        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  0, 0, 0,  0, 0, 0,
         
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  0, 0, 0,  0, 0, 0,
          0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,  0, 0, 0,  0, 0, 0,
@@ -337,7 +337,8 @@ void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program
         rotation_angle += glm::radians(delta_time * 30.0f);
     }
     if (enable_rotation) {
-        cube_model = glm::rotate(cube_model, rotation_angle, glm::normalize(glm::vec3(1.0, 1.0, 0.0)));
+        cube_model = glm::rotate(cube_model, rotation_angle,
+                                 glm::normalize(glm::vec3(1.0f, 1.0f, 0.0f)));
     }
 
     cube_shader_program.setMat4("model", cube_model);
