@@ -1,0 +1,7 @@
+#version 330 core
+
+void main()
+{             
+    // It's empty fragment shader
+    // The depth value will be calculated anyway.
+}

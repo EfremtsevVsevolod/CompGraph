@@ -68,6 +68,9 @@ extern bool activaleRotationKeyPressed;
 extern bool parallax;
 extern bool parallaxKeyPressed;
 
+extern bool CookTorrance;
+extern bool CookTorranceKeyPressed;
+
 void InitializeAndConfigurateGLFW();
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 

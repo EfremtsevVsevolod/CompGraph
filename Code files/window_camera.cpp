@@ -129,6 +129,14 @@ void WindowCamera::ProcessInput(float delta_time) {
             height_scale = 1.0f;
         }
     }
+
+    if (glfwGetKey(glfw_window, GLFW_KEY_K) == GLFW_PRESS && !CookTorranceKeyPressed) {
+        CookTorrance = !CookTorrance;
+        CookTorranceKeyPressed = true;
+    }
+    if (glfwGetKey(glfw_window, GLFW_KEY_K) == GLFW_RELEASE) {
+        CookTorranceKeyPressed = false;
+    }
 }
 
 void WindowCamera::SwapBuffersAndPollEvents() {

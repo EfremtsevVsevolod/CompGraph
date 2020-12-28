@@ -58,21 +58,24 @@ CameraState global_camera_state;
 // Освещение
 glm::vec3 lightPos(1.5f, 1.5f, 1.0f);
 
-// Blinn (false) or Blinn-Phong (true)
-bool blinn_phong = false;
-bool blinnKeyPressed = false;
+// Начальные установки эффектов
+bool blinn_phong = true;
+bool blinnKeyPressed = blinn_phong;
 
 bool post_effect = false;
-bool postEffectKeyPressed = false;
+bool postEffectKeyPressed = post_effect;
 
 bool normal_mapping_effect = true;
-bool normalMappingKeyPressed = true;
+bool normalMappingKeyPressed = normal_mapping_effect;
 
 bool activate_rotation = false;
-bool activaleRotationKeyPressed = false;
+bool activaleRotationKeyPressed = activate_rotation;
 
 bool parallax = true;
-bool parallaxKeyPressed = true;
+bool parallaxKeyPressed = parallax;
+
+bool CookTorrance = false;
+bool CookTorranceKeyPressed = CookTorrance;
 
 
 //  AUXILARY FUNCTIONS
@@ -321,6 +324,8 @@ void PrepareCube(WindowCamera& window_camera, ShaderProgram& cube_shader_program
 
     cube_shader_program.setBool("normal_mapping_flag", normal_mapping_effect);
     cube_shader_program.setBool("paralax_flag", parallax);
+    cube_shader_program.setBool("blinn_phong_flag", blinn_phong);
+    cube_shader_program.setBool("cook_torrance_flag", CookTorrance);
 
     glm::mat4 cube_projection = glm::perspective(glm::radians(global_camera_state.Zoom),
         (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
@@ -378,11 +383,12 @@ void PreparePlane(WindowCamera& window_camera, ShaderProgram& plane_shader_progr
 
     plane_shader_program.setBool("normal_mapping_flag", normal_mapping_effect);
     plane_shader_program.setBool("paralax_flag", false);
+    plane_shader_program.setBool("cook_torrance_flag", false);
 
     // установка uniforms-переменных освещения
     plane_shader_program.setVec3("viewPos", global_camera_state.Position);
     plane_shader_program.setVec3("lightPos", lightPos);
-    plane_shader_program.setInt("blinn_phong", blinn_phong);
+    plane_shader_program.setInt("blinn_phong_flag", blinn_phong);
 
     // мировое преобразование
     glm::mat4 plane_model = glm::mat4(1.0f);
